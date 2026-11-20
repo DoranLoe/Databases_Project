@@ -28,7 +28,7 @@ public class StringToSQL {
 			
 			fileStream.print(fileContents);
 			
-			IO.println("fileCreated: "+fileName);
+			IO.println("TXTfileCreated: "+fileName);
 			
 		}catch (FileNotFoundException fnfe){
 			IO.println("This is not how you make a file");
