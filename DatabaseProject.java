@@ -194,11 +194,43 @@ public class DatabaseProject {
 		//we don't need to do this more than once.
 		// infact, this should really just be called from createTables()
 		
-		String temp = "";
-		
 		fillmg_table(); //trust me this needs to be a seperate method
 		
 		//fillout the book_lvl table
+		// thankfully this only has 10 levels.
+		// treats all kioku as 5* because That would mean putting more data in the kioku table and making more tables here.
+		// most are 5* anyways so no big loss.
+		String temp = "";
+		
+		for (int i=1; i<10;i++)
+		{
+			int scrll = (i<4)? i*10:
+						(i<7)? (i-3)*20+30: (i-6)*40+80;
+			int cdx = 0;
+			switch(i)
+			{
+				case 2: cdx =3; break;
+				case 3: cdx =5; break;
+				case 4: cdx =9; break;
+				case 5: cdx =12; break;
+				case 6: cdx =18; break;
+				case 7: cdx =24; break;
+				case 8: cdx =36; break;
+				case 9: cdx =48; break;
+				default: cdx=0;
+			}
+			int gmr = 	(i<3)? 0:
+						(i<6)? i-2:
+						(i<8)? (i-5)*2 +3:
+						(i==8)? 10:12;
+			
+			temp = 	"INSERT INTO book_lvl VALUES("+
+					scrll+","+
+					cdx+","+
+					gmr+","+");\n";
+			str = str+ temp;
+		}
+		
 		
 		//fillout the xp_lvl table
 		
@@ -206,14 +238,15 @@ public class DatabaseProject {
 		
 	}
 	
-	private void fillmg_table()// what the fudge
+	private void fillmg_table()// what the fudge still needs levels 120-150
 	{
 		String temp = "";
 		
 		//fillout the mg_lvl table
 		//magic level currently caps out at 150 I think
-		// But I only have data for the first 130 levels.
 		// data from https://docs.google.com/spreadsheets/d/e/2PACX-1vSmMCjLn52tBVzDa-iaHhIGxpANKJUcRiB3yqkZSSUwYmOaH5-hvxCx4xjIMDm0GOUO7pdXDHCoA8zF/pubhtml#gid=1316531278
+		// But I only have data for the first 130 levels.
+		// I'll have to fill out some more on my own.
 		for (int i =0; i<130;i++)
 		{
 			int pc = 0; // prism_cores. I don't have the info on the levels that use them. will have to find that.
@@ -242,7 +275,8 @@ public class DatabaseProject {
 						(i==74|| i==80||i==86)? 35:
 						(i==92||i==98||i==104)? 40:
 						(i==59|| i==110||i==116||i==119)? 50:0; // the data cuts off abrubptly at level120, might be worth checking it.
-			int ec = 0; //data im using doesn't display the level it's used. find out later.
+			
+			int ec = 0; //data im using doesn't display the levels it's used. find out later.
 			
 			int eg =0;
 			switch(i)
