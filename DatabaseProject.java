@@ -10,8 +10,8 @@
 
 
 public class DatabaseProject {
-	String str;// string will serve as the contents of our file prior to the file's creation which will be handled in a seperate FileCreator class.
-	boolean addsTables;
+	private String str;// string will serve as the contents of our file prior to the file's creation which is handled in a different class.
+	boolean addsTables, fillsUpgradeTables, fillsGirlsTable;
 	
 	public static void main (String[] args) {
 		IO.println("Testing Time!");
@@ -24,7 +24,11 @@ public class DatabaseProject {
 	{
 		str = "";	
 		addsTables = false;
+		fillsUpgradeTables = false;
 	}
+	
+	
+	//create methods
 	
 	private void createTables()
 	{
@@ -179,9 +183,111 @@ public class DatabaseProject {
 			"\nrelease_date DATE"+
 			"\n);\n";
 		
-		str = temp+str;
+		str = temp+"n"+str;
 	}
 	
+	private void fillUpgradeTables() //unfinished
+	{
+		if(fillsUpgradeTables)
+			return;
+		fillsUpgradeTables = true;
+		//we don't need to do this more than once.
+		// infact, this should really just be called from createTables()
+		
+		String temp = "";
+		
+		fillmg_table(); //trust me this needs to be a seperate method
+		
+		//fillout the book_lvl table
+		
+		//fillout the xp_lvl table
+		
+		//fillout the hrt_lvl table
+		
+	}
+	
+	private void fillmg_table()// what the fudge
+	{
+		String temp = "";
+		
+		//fillout the mg_lvl table
+		//magic level currently caps out at 150 I think
+		// But I only have data for the first 130 levels.
+		// data from https://docs.google.com/spreadsheets/d/e/2PACX-1vSmMCjLn52tBVzDa-iaHhIGxpANKJUcRiB3yqkZSSUwYmOaH5-hvxCx4xjIMDm0GOUO7pdXDHCoA8zF/pubhtml#gid=1316531278
+		for (int i =0; i<130;i++)
+		{
+			int pc = 0; // prism_cores. I don't have the info on the levels that use them. will have to find that.
+			int po = 	(i==59)? 1://prism_orbs, one at 59,89,110-127 two at 128,129, unknown beyond.
+						(i==89)? 1:
+						(i>=110 && i<128)? 1:
+						(i>=128)? 2:0 ;
+						
+			int pg = 	(i>=30)? 0: //prism_gems
+						(i<89)? ((i-13)/15)*5: // why couldn't this pattern just keep?
+						(i<105)? 25:(i<120)? 30:
+						(i<124)? 60:
+						(i<128)? 90:120; 
+						
+			int ps =	(i<29)? 50://prism stones
+						(i<120)? (i+1)/30*100:
+						(i<124)? 400:
+						(i<128)? 500:700;
+						
+			int es =	(i==4||i==9||i==14)? 5:// elemental stones
+						(i==19||i==24)? 10:
+						(i==29|| i==32|| i==35||i==107)? 15:
+						(i==39||i==41||i==44||i==65||i==71||i==77||i==83||i==89||i==95||i==101|| i==113)? 20: // at this point a switch case might have been a better idea
+						(i==47||i==50||i==53)? 25: // yeah I think im going to do switch case for the other two elemental items
+						(i==56||i==62||i==68)? 30:
+						(i==74|| i==80||i==86)? 35:
+						(i==92||i==98||i==104)? 40:
+						(i==59|| i==110||i==116||i==119)? 50:0; // the data cuts off abrubptly at level120, might be worth checking it.
+			int ec = 0; //data im using doesn't display the level it's used. find out later.
+			
+			int eg =0;
+			switch(i)
+			{
+				case 50: case 53:
+				case 47: eg=5; break;
+				case 62: case 65: case 68: case 71: case 77: case 83: case 89: case 95: case 101: case 107: case 113:
+				case 56: eg=10; break;
+				case 80: case 86:
+				case 74: eg=15; break;
+				case 98: case 104:
+				case 92: eg=20; break;
+				case 110: case 116: case 119:
+				case 59: eg=30; break;
+				default: eg=0;
+			}
+			int eo=0;
+			switch(i)
+			{
+				case 86: case 92: case 95:
+				case 80: eo=1; break;
+				case 101: case 104: case 107:
+				case 89: eo=2; break;
+				case 113: case 116: case 119:
+				case 110: eo=3; break;
+			}
+						
+			temp = "INSERT INTO mg_lvl \nVALUES("+
+					""+pc+","+//prism_cores, first 130 doesn't use them
+					""+po+","+
+					""+pg+","+
+					""+ps+","+
+					""+ec+","+
+					""+eo+","+
+					""+eg+","+
+					""+es+","+
+					");\n";
+			str = str+temp;
+		}
+	}
+	
+	private void updateInventory()//unfinished
+	{}
+	
+	//file methods
 	
 	private void createFile()
 	{
