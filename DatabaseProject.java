@@ -16,7 +16,8 @@ public class DatabaseProject {
 	public static void main (String[] args) {
 		IO.println("Testing Time!");
 		DatabaseProject test = new DatabaseProject();
-		test.createTables();
+		//test.createTables();
+		test.fillUpgradeTables();
 		test.createFile();
 	}
 	
@@ -227,14 +228,42 @@ public class DatabaseProject {
 			temp = 	"INSERT INTO book_lvl VALUES("+
 					scrll+","+
 					cdx+","+
-					gmr+","+");\n";
+					gmr+");\n";
 			str = str+ temp;
 		}
 		
 		
 		//fillout the xp_lvl table
+		temp ="";
+		int xpA =20; // amount of xp needed to go up to next level
+		int xpB =10; // increase in xp needed, 
+		
+		for (int i=2; i<=100; i++)// change later, levels go above 100 now.
+		{
+			xpA += xpB;
+			temp=	"INSERT INTO xp_lvl VALUES("+xpA+");\n";
+			str = str+temp;
+			if (i<14) xpB+= ((i-1)/2%2 ==0)? 2:3; //For the first 14 levels xpB increases every level by 2 or 3, alternating every two levels after the first.
+			else if (i==14) xpB =100; //suddenly jumps to 100
+			else if (i<50) xpB += ((i-2)/2%2 ==0)? 2:3; // back to 2 and 3 alternating but now on a different alternation point
+			else if (i ==50) xpB =300; // sudden jump to 300
+			else if (i<69)xpB+=5; 
+			else if (i==69) xpB= 365;// why the decrease? was 390 before this
+			else if (i==70) xpB= 500; //WHY??
+			else if (i<99) xpB+=10;
+			else xpB = 800;
+		}
 		
 		//fillout the hrt_lvl table
+		// theres 50 levels to these ones. unfortunately each level has it's own cost in an increasing amount. I can do something somewhat clever here.
+		temp ="";
+		int hrtA=0; // the thing I noticed is that the amount of heartsand needed is 100*the level you're at +50 + the hrtamount needed at the previous level.
+		for (int i=2; i<=50; i++)
+		{
+			hrtA += ((100*(i-2))+50); //and tadaa! we have a summation.
+			temp=	"INSERT INTO hrt_lvl VALUES("+hrtA+");\n";
+			str = str+temp;
+		}
 		
 	}
 	
@@ -247,61 +276,77 @@ public class DatabaseProject {
 		// data from https://docs.google.com/spreadsheets/d/e/2PACX-1vSmMCjLn52tBVzDa-iaHhIGxpANKJUcRiB3yqkZSSUwYmOaH5-hvxCx4xjIMDm0GOUO7pdXDHCoA8zF/pubhtml#gid=1316531278
 		// But I only have data for the first 130 levels.
 		// I'll have to fill out some more on my own.
-		for (int i =0; i<130;i++)
+		for (int i =2; i<=130;i++) // my table is one off of theirs, but I can use their numbers here by off settign the loop
 		{
 			int pc = 0; // prism_cores. I don't have the info on the levels that use them. will have to find that.
-			int po = 	(i==59)? 1://prism_orbs, one at 59,89,110-127 two at 128,129, unknown beyond.
-						(i==89)? 1:
-						(i>=110 && i<128)? 1:
-						(i>=128)? 2:0 ;
+			int po = 	(i==60)? 1://prism_orbs, one at 59,89,110-127 two at 128,129, unknown beyond.
+						(i==90)? 1:
+						(i>=111 && i<=128)? 1:
+						(i>128)? 2:0 ;
 						
-			int pg = 	(i>=30)? 0: //prism_gems
-						(i<89)? ((i-13)/15)*5: // why couldn't this pattern just keep?
-						(i<105)? 25:(i<120)? 30:
-						(i<124)? 60:
-						(i<128)? 90:120; 
+			int pg = 	(i<31)? 0: //prism_gems
+						(i<90)? ((i-13)/15)*5: // why couldn't this pattern just keep?
+						(i<106)? 25:(i<=120)? 30:
+						(i<125)? 60:
+						(i<129)? 90:120; 
 						
-			int ps =	(i<29)? 50://prism stones
-						(i<120)? (i+1)/30*100:
-						(i<124)? 400:
-						(i<128)? 500:700;
-						
-			int es =	(i==4||i==9||i==14)? 5:// elemental stones
-						(i==19||i==24)? 10:
-						(i==29|| i==32|| i==35||i==107)? 15:
-						(i==39||i==41||i==44||i==65||i==71||i==77||i==83||i==89||i==95||i==101|| i==113)? 20: // at this point a switch case might have been a better idea
-						(i==47||i==50||i==53)? 25: // yeah I think im going to do switch case for the other two elemental items
-						(i==56||i==62||i==68)? 30:
-						(i==74|| i==80||i==86)? 35:
-						(i==92||i==98||i==104)? 40:
-						(i==59|| i==110||i==116||i==119)? 50:0; // the data cuts off abrubptly at level120, might be worth checking it.
+			int ps =	(i<30)? 50://prism stones
+						(i<121)? (i-1)/30*100:
+						(i<125)? 400:
+						(i<129)? 500:700;
+			
+			//the elemental ones all are needed on the same levels. an observation I wish I made earlier
+			
+			int es =0;	/*(i==5||i==10||i==15)? 5:// elemental stones
+						(i==20||i==25)? 10:
+						(i==30|| i==33|| i==36||i==108)? 15:
+						(i==39||i==42||i==45||i==66||i==72||i==78||i==84||i==90||i==96||i==102|| i==114)? 20: // at this point a switch case might have been a better idea
+						(i==48||i==51||i==54)? 25: // yeah I think im going to do switch case for the other two elemental items
+						(i==57||i==63||i==69)? 30:
+						(i==75|| i==81||i==87)? 35:
+						(i==93||i==99||i==105)? 40:
+						(i==60|| i==111||i==117||i==120)? 50:0; // the data cuts off abrubptly at level120, might be worth checking it.*/
 			
 			int ec = 0; //data im using doesn't display the levels it's used. find out later.
-			
+			int eo=0;
 			int eg =0;
 			switch(i)
 			{
-				case 50: case 53:
-				case 47: eg=5; break;
-				case 62: case 65: case 68: case 71: case 77: case 83: case 89: case 95: case 101: case 107: case 113:
-				case 56: eg=10; break;
-				case 80: case 86:
-				case 74: eg=15; break;
-				case 98: case 104:
-				case 92: eg=20; break;
-				case 110: case 116: case 119:
-				case 59: eg=30; break;
-				default: eg=0;
-			}
-			int eo=0;
-			switch(i)
-			{
-				case 86: case 92: case 95:
-				case 80: eo=1; break;
-				case 101: case 104: case 107:
-				case 89: eo=2; break;
-				case 113: case 116: case 119:
-				case 110: eo=3; break;
+				case 10: case 15:
+				case 5: es = 5; break;
+				
+				case 108: eo=2; //no break
+				case 25:
+				case 20: es =10; break;
+				
+				case 33: case 36:
+				case 30: es=15; break;
+				
+				case 102: eo=2; //no break
+				case 90: case 84: case 78: case 72: case 66: eg=10; //no break
+				case 42: case 45:
+				case 39: es =20; break;
+				
+				case 51: case 54:
+				case 48: es=25; eg=5; break;
+				
+				case 63: case 69:
+				case 57: es=30; eg=10; break;
+				
+				case 60: es =50; eg=30; break;
+				
+				case 87: case 81: eo=1; //no break
+				case 75: es=35; eg=15; break;
+				
+				case 105:
+				case 99: es=40; eg=20; eo=2; break;
+				
+				case 117: case 120:
+				case 111: es=50; eg=30; eo=3; break;
+				
+				case 114: es=20; eg=10; eo=3; break;
+				
+				default: eg=0; es=0; eo=0;
 			}
 						
 			temp = "INSERT INTO mg_lvl \nVALUES("+
@@ -312,7 +357,7 @@ public class DatabaseProject {
 					""+ec+","+
 					""+eo+","+
 					""+eg+","+
-					""+es+","+
+					""+es+
 					");\n";
 			str = str+temp;
 		}
